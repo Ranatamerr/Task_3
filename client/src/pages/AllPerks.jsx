@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { use, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../api'
 
@@ -29,8 +29,22 @@ export default function AllPerks() {
  * useEffect Hook #2: Auto-search on Input Change
 
 */
-
+useEffect(() => {
+    // Load all perks when component mounts
+    loadAllPerks()
+    // Empty dependency array means this effect runs only once on mount
+  }, []) // Empty dependency array
   
+  useEffect(() => {
+    setError('')
+
+    const handler = setTimeout(() => {
+      loadAllPerks()
+    }, 500)
+
+    return () => clearTimeout(handler)
+  }, [searchQuery, merchantFilter]) // Dependencies: searchQuery, merchantFilter
+
   useEffect(() => {
     // Extract all merchant names from perks array
     const merchants = perks
@@ -136,6 +150,8 @@ export default function AllPerks() {
                 type="text"
                 className="input"
                 placeholder="Enter perk name..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
                 
               />
               <p className="text-xs text-zinc-500 mt-1">
@@ -151,6 +167,8 @@ export default function AllPerks() {
               </label>
               <select
                 className="input"
+                value={merchantFilter}
+                onChange={e => setMerchantFilter(e.target.value)}
                 
               >
                 <option value="">All Merchants</option>
